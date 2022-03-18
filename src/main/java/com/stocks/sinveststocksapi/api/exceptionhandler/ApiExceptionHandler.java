@@ -7,8 +7,9 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
-import com.stocks.sinveststocksapi.domain.exception.EntidadeNaoEncontradaException;
+
 import com.stocks.sinveststocksapi.domain.exception.NegocioException;
+import com.stocks.sinveststocksapi.domain.exception.StockNaoEncontradaException;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.TypeMismatchException;
@@ -65,7 +66,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                             .userMessage(message)
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(detail)
@@ -127,7 +128,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         String detail = String.format("O parâmetro de URL '%s' recebeu o valor '%s', "
                 + "que é de um tipo inválido. Corrija e informe um valor compatível com o tipo %s.",
-                ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName());
+                ex.getName(), ex.getValue());
 
         Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
@@ -190,9 +191,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, problem, headers, status, request);
     }
 
-    @ExceptionHandler(EntidadeNaoEncontradaException.class)
-    public ResponseEntity<?> handleEntidadeNaoEncontrada(
-            EntidadeNaoEncontradaException ex, WebRequest request) {
+    @ExceptionHandler(StockNaoEncontradaException.class)
+    public ResponseEntity<Object> handleEntidadeNaoEncontrada(
+            StockNaoEncontradaException ex, WebRequest request) {
 
         HttpStatus status = HttpStatus.NOT_FOUND;
         ProblemType problemType = ProblemType.RECURSO_NAO_ENCONTRADO;
@@ -206,7 +207,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(NegocioException.class)
-    public ResponseEntity<?> handleNegocioException(
+    public ResponseEntity<Object> handleNegocioException(
             NegocioException ex, WebRequest request) {
 
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -254,7 +255,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     private String joinPath(List<Reference> references) {
         return references.stream()
-                .map(ref -> ref.getFieldName())
+                .map(Reference::getFieldName)
                 .collect(Collectors.joining("."));
     }
 }

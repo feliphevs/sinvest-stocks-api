@@ -48,4 +48,5 @@ public class Stock {
     @UpdateTimestamp
     @Column(nullable = false)
     private Timestamp updatedOn;
+
 }

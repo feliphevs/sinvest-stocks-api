@@ -1,13 +1,8 @@
 package com.stocks.sinveststocksapi.api.controller;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stocks.sinveststocksapi.api.dto.StockAskBidDto;
 import com.stocks.sinveststocksapi.api.dto.StockDto;
 import com.stocks.sinveststocksapi.api.dto.StockRespostaDto;
 import com.stocks.sinveststocksapi.core.ModelMapperUtils;
@@ -16,16 +11,11 @@ import com.stocks.sinveststocksapi.domain.repository.StockRepository;
 import com.stocks.sinveststocksapi.domain.service.StockService;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.util.ReflectionUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,7 +25,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/stocks")
 public class StockController {
 
@@ -73,41 +62,15 @@ public class StockController {
         return ModelMapperUtils.map(stockService.adicionar(stockAtual), StockRespostaDto.class);
     }
 
-    @PatchMapping("/{stockId}")
-    public StockRespostaDto atualizarParcial(@PathVariable Long stockId,
-            @RequestBody Map<String, Object> campos, HttpServletRequest request) {
+    @PutMapping("/updateaskbid/{stockId}")
+    public StockRespostaDto atualizar(@PathVariable Long stockId,
+            @RequestBody StockAskBidDto stockAskBidDto) {
+
         Stock stockAtual = stockService.buscarOuFalhar(stockId);
 
-        merge(campos, stockAtual, request);
+        BeanUtils.copyProperties(stockAskBidDto, stockAtual);
 
-        StockDto stockConvertida = ModelMapperUtils.map(stockAtual, StockDto.class);
-
-        return atualizar(stockId, stockConvertida);
-    }
-
-    private void merge(Map<String, Object> dadosOrigem, Stock stockDestino,
-            HttpServletRequest request) {
-        ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
-
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, true);
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-
-            Stock stockOrigem = objectMapper.convertValue(dadosOrigem, Stock.class);
-
-            dadosOrigem.forEach((nomePropriedade, valorPropriedade) -> {
-                Field field = ReflectionUtils.findField(Stock.class, nomePropriedade);
-                field.setAccessible(true);
-
-                Object novoValor = ReflectionUtils.getField(field, stockOrigem);
-
-                ReflectionUtils.setField(field, stockDestino, novoValor);
-            });
-        } catch (IllegalArgumentException e) {
-            Throwable rootCause = ExceptionUtils.getRootCause(e);
-            throw new HttpMessageNotReadableException(e.getMessage(), rootCause, serverHttpRequest);
-        }
+        return ModelMapperUtils.map(stockService.adicionar(stockAtual), StockRespostaDto.class);
     }
 
     @DeleteMapping("/{stockId}")

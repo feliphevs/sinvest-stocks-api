@@ -2,18 +2,18 @@ package com.stocks.sinveststocksapi.core;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
 public class ModelMapperUtils {
-    
+
     private static final ModelMapper modelMapper;
 
     /**
      * Model mapper property setting are specified in the following block.
-     * Default property matching strategy is set to Strict see {@link MatchingStrategies}
+     * Default property matching strategy is set to Strict see
+     * {@link MatchingStrategies}
      * Custom mappings are added using {@link ModelMapper#addMappings(PropertyMap)}
      */
     static {
@@ -28,7 +28,9 @@ public class ModelMapperUtils {
     }
 
     /**
-     * <p>Note: outClass object must have default constructor with no arguments</p>
+     * <p>
+     * Note: outClass object must have default constructor with no arguments
+     * </p>
      *
      * @param <D>      type of result object.
      * @param <T>      type of source object to map from.
@@ -41,7 +43,9 @@ public class ModelMapperUtils {
     }
 
     /**
-     * <p>Note: outClass object must have default constructor with no arguments</p>
+     * <p>
+     * Note: outClass object must have default constructor with no arguments
+     * </p>
      *
      * @param entityList list of entities that needs to be mapped
      * @param outCLass   class of result list element
@@ -52,7 +56,8 @@ public class ModelMapperUtils {
     public static <D, T> List<D> mapAll(final Collection<T> entityList, Class<D> outCLass) {
         return entityList.stream()
                 .map(entity -> map(entity, outCLass))
-                .collect(Collectors.toList());
+                .toList();
+
     }
 
     /**
