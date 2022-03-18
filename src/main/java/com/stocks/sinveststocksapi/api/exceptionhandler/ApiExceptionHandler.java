@@ -57,8 +57,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
                     String name = objectError.getObjectName();
 
-                    if (objectError instanceof FieldError) {
-                        name = ((FieldError) objectError).getField();
+                    if (objectError instanceof FieldError fieldError) {
+                        name = fieldError.getField();
                     }
 
                     return Problem.Object.builder()
@@ -83,8 +83,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         ProblemType problemType = ProblemType.ERRO_DE_SISTEMA;
         String detail = MSG_ERRO_GENERICA_USUARIO_FINAL;
-
-        ex.printStackTrace();
 
         Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(detail)
@@ -112,9 +110,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
             HttpStatus status, WebRequest request) {
 
-        if (ex instanceof MethodArgumentTypeMismatchException) {
+        if (ex instanceof MethodArgumentTypeMismatchException exception) {
             return handleMethodArgumentTypeMismatch(
-                    (MethodArgumentTypeMismatchException) ex, headers, status, request);
+                    exception, headers, status, request);
         }
 
         return super.handleTypeMismatch(ex, headers, status, request);
@@ -142,10 +140,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers, HttpStatus status, WebRequest request) {
         Throwable rootCause = ExceptionUtils.getRootCause(ex);
 
-        if (rootCause instanceof InvalidFormatException) {
-            return handleInvalidFormat((InvalidFormatException) rootCause, headers, status, request);
-        } else if (rootCause instanceof PropertyBindingException) {
-            return handlePropertyBinding((PropertyBindingException) rootCause, headers, status, request);
+        if (rootCause instanceof InvalidFormatException exception) {
+            return handleInvalidFormat(exception, headers, status, request);
+        } else if (rootCause instanceof PropertyBindingException exception) {
+            return handlePropertyBinding(exception, headers, status, request);
         }
 
         ProblemType problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL;
@@ -231,9 +229,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                     .status(status.value())
                     .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                     .build();
-        } else if (body instanceof String) {
+        } else if (body instanceof String string) {
             body = Problem.builder()
-                    .title((String) body)
+                    .title(string)
                     .status(status.value())
                     .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                     .build();
