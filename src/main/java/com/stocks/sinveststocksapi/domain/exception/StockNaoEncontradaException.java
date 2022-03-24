@@ -5,7 +5,7 @@ public class StockNaoEncontradaException extends NegocioException {
         super(mensagem);
     }
 
-    public StockNaoEncontradaException(Long userId) {
-        this(String.format("Não existe uma stock com código %d", userId));
+    public StockNaoEncontradaException(Long stockId) {
+        this(String.format("Não existe uma stock com código %d", stockId));
     }
 }

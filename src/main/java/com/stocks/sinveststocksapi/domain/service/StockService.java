@@ -1,5 +1,8 @@
 package com.stocks.sinveststocksapi.domain.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.stocks.sinveststocksapi.domain.exception.StockNaoEncontradaException;
 import com.stocks.sinveststocksapi.domain.model.Stock;
 import com.stocks.sinveststocksapi.domain.repository.StockRepository;
@@ -13,6 +16,10 @@ public class StockService {
 
     @Autowired
     private StockRepository stockRepository;
+
+    public List<Stock> listar() {
+        return stockRepository.findAllByOrderByIdAsc();
+    }
 
     public Stock adicionar(Stock stock) {
         return stockRepository.save(stock);

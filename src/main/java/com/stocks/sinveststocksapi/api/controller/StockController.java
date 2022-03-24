@@ -7,7 +7,6 @@ import com.stocks.sinveststocksapi.api.dto.StockDto;
 import com.stocks.sinveststocksapi.api.dto.StockRespostaDto;
 import com.stocks.sinveststocksapi.core.ModelMapperUtils;
 import com.stocks.sinveststocksapi.domain.model.Stock;
-import com.stocks.sinveststocksapi.domain.repository.StockRepository;
 import com.stocks.sinveststocksapi.domain.service.StockService;
 
 import org.springframework.http.HttpStatus;
@@ -31,14 +30,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class StockController {
 
     @Autowired
-    private StockRepository stockRepository;
-
-    @Autowired
     private StockService stockService;
 
     @GetMapping
     public List<StockRespostaDto> listar() {
-        return ModelMapperUtils.mapAll(stockRepository.findAllByOrderByIdAsc(), StockRespostaDto.class);
+        return ModelMapperUtils.mapAll(stockService.listar(), StockRespostaDto.class);
     }
 
     @GetMapping("/{stockId}")
